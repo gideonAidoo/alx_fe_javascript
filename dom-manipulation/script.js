@@ -213,3 +213,87 @@ function importFromJsonFile(event) {
 // ====== EVENT LISTENERS ======
 if (newQuoteBtn) newQuoteBtn.addEventListener('click', showRandomQuote);
 if (importFile) importFile.addEventListener('change', importFromJsonFile);
+
+/* Removed duplicate declaration of quotes */
+
+// Load quotes from local storage
+function loadQuotes() {
+  const storedQuotes = localStorage.getItem('quotes');
+  if (storedQuotes) {
+    quotes = JSON.parse(storedQuotes);
+  }
+}
+
+// Save quotes to local storage
+function saveQuotes() {
+  localStorage.setItem('quotes', JSON.stringify(quotes));
+}
+
+// Display a random quote
+function showRandomQuote() {
+  if (quotes.length === 0) {
+    document.getElementById('quoteDisplay').textContent = 'No quotes available.';
+    return;
+  }
+  const randomIndex = Math.floor(Math.random() * quotes.length);
+  const quote = quotes[randomIndex];
+  document.getElementById('quoteDisplay').textContent = `"${quote.text}" - ${quote.category}`;
+}
+
+// Add a new quote
+function addQuote() {
+  const text = document.getElementById('newQuoteText').value.trim();
+  const category = document.getElementById('newQuoteCategory').value.trim();
+  if (text && category) {
+    quotes.push({ text, category });
+    saveQuotes();
+    document.getElementById('newQuoteText').value = '';
+    document.getElementById('newQuoteCategory').value = '';
+    alert('Quote added!');
+  } else {
+    alert('Please fill in both fields.');
+  }
+}
+
+// Simulate fetching from server
+async function fetchQuotesFromServer() {
+  try {
+    const res = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5');
+    const data = await res.json();
+    // Simulate quotes from server
+    const serverQuotes = data.map(item => ({
+      text: item.title,
+      category: 'Server'
+    }));
+
+    resolveConflicts(serverQuotes);
+  } catch (error) {
+    console.error('Error fetching from server:', error);
+  }
+}
+
+// Conflict resolution: server takes precedence
+function resolveConflicts(serverQuotes) {
+  let changesMade = false;
+
+  serverQuotes.forEach(serverQuote => {
+    const exists = quotes.some(q => q.text === serverQuote.text && q.category === serverQuote.category);
+    if (!exists) {
+      quotes.push(serverQuote);
+      changesMade = true;
+    }
+  });
+
+  if (changesMade) {
+    saveQuotes();
+    alert('Quotes updated from server.');
+  }
+}
+
+// Periodically sync every 30 seconds
+setInterval(fetchQuotesFromServer, 30000);
+
+// Initialize app
+document.getElementById('newQuote').addEventListener('click', showRandomQuote);
+loadQuotes();
+showRandomQuote();
