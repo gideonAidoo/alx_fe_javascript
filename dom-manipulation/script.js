@@ -8,9 +8,6 @@ let quotes = [
 // DOM references
 const quoteDisplay = document.getElementById("quoteDisplay");
 const newQuoteBtn = document.getElementById("newQuote");
-const addQuoteBtn = document.getElementById("addQuoteBtn");
-const newQuoteText = document.getElementById("newQuoteText");
-const newQuoteCategory = document.getElementById("newQuoteCategory");
 const categoryFilter = document.getElementById("categoryFilter");
 
 // Populate category dropdown from quotes array
@@ -41,8 +38,8 @@ function showRandomQuote() {
 
 // Add a new quote
 function addQuote() {
-  const text = newQuoteText.value.trim();
-  const category = newQuoteCategory.value.trim();
+  const text = document.getElementById("newQuoteText").value.trim();
+  const category = document.getElementById("newQuoteCategory").value.trim();
 
   if (text && category) {
     quotes.push({ text, category });
@@ -51,8 +48,8 @@ function addQuote() {
     populateCategories();
 
     // Clear input fields
-    newQuoteText.value = "";
-    newQuoteCategory.value = "";
+    document.getElementById("newQuoteText").value = "";
+    document.getElementById("newQuoteCategory").value = "";
 
     alert("Quote added successfully!");
   } else {
@@ -60,10 +57,42 @@ function addQuote() {
   }
 }
 
+// Dynamically create the Add Quote Form
+function createAddQuoteForm() {
+  const formSection = document.createElement("div");
+  formSection.className = "form-section";
+
+  const heading = document.createElement("h3");
+  heading.textContent = "Add a New Quote";
+
+  const quoteInput = document.createElement("input");
+  quoteInput.id = "newQuoteText";
+  quoteInput.type = "text";
+  quoteInput.placeholder = "Enter a new quote";
+
+  const categoryInput = document.createElement("input");
+  categoryInput.id = "newQuoteCategory";
+  categoryInput.type = "text";
+  categoryInput.placeholder = "Enter quote category";
+
+  const addBtn = document.createElement("button");
+  addBtn.textContent = "Add Quote";
+  addBtn.addEventListener("click", addQuote);
+
+  // Append everything to form section
+  formSection.appendChild(heading);
+  formSection.appendChild(quoteInput);
+  formSection.appendChild(categoryInput);
+  formSection.appendChild(addBtn);
+
+  // Append form to body (or another container)
+  document.body.appendChild(formSection);
+}
+
 // Event listeners
 newQuoteBtn.addEventListener("click", showRandomQuote);
-addQuoteBtn.addEventListener("click", addQuote);
 categoryFilter.addEventListener("change", showRandomQuote);
 
 // Initial setup
 populateCategories();
+createAddQuoteForm();
