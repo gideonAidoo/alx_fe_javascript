@@ -329,3 +329,41 @@ async function addQuote() {
     alert('Please fill in both fields.');
   }
 }
+
+async function syncQuotes() {
+  try {
+    const res = await fetch('https://jsonplaceholder.typicode.com/posts');
+    const serverQuotes = await res.json();
+
+    // Simulate mapping server data to quote objects
+    const formattedServerQuotes = serverQuotes.slice(0, 10).map(post => ({
+      text: post.title,
+      category: 'Server'
+    }));
+
+    let localQuotes = loadQuotes();
+
+    // Conflict resolution: Server data takes precedence
+    const mergedQuotes = [...formattedServerQuotes];
+
+    // Add local quotes that are not duplicates
+    localQuotes.forEach(lq => {
+      if (!mergedQuotes.some(sq => sq.text === lq.text && sq.category === lq.category)) {
+        mergedQuotes.push(lq);
+      }
+    });
+
+    quotes = mergedQuotes;
+    saveQuotes();
+    console.log('Quotes synced successfully!');
+
+    // Optional: notify user
+    alert('Quotes synced with server data. Server data took priority.');
+
+  } catch (error) {
+    console.error('Error syncing quotes:', error);
+  }
+}
+
+// Example: Periodically sync every 60 seconds
+setInterval(syncQuotes, 60000);
