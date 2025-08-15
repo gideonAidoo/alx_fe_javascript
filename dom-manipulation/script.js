@@ -297,3 +297,35 @@ setInterval(fetchQuotesFromServer, 30000);
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 loadQuotes();
 showRandomQuote();
+
+async function addQuote() {
+  const text = document.getElementById('newQuoteText').value.trim();
+  const category = document.getElementById('newQuoteCategory').value.trim();
+
+  if (text && category) {
+    const newQuote = { text, category };
+    quotes.push(newQuote);
+    saveQuotes();
+
+    // POST to server (simulated)
+    try {
+      const res = await fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newQuote)
+      });
+      const data = await res.json();
+      console.log('Quote sent to server:', data);
+    } catch (error) {
+      console.error('Error sending quote to server:', error);
+    }
+
+    document.getElementById('newQuoteText').value = '';
+    document.getElementById('newQuoteCategory').value = '';
+    alert('Quote added!');
+  } else {
+    alert('Please fill in both fields.');
+  }
+}
