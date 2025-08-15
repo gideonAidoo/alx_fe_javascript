@@ -367,3 +367,71 @@ async function syncQuotes() {
 
 // Example: Periodically sync every 60 seconds
 setInterval(syncQuotes, 60000);
+
+async function syncQuotes() {
+  try {
+    const res = await fetch('https://jsonplaceholder.typicode.com/posts');
+    const serverQuotes = await res.json();
+
+    // Map server data to quote format
+    const formattedServerQuotes = serverQuotes.slice(0, 10).map(post => ({
+      text: post.title,
+      category: 'Server'
+    }));
+
+    let localQuotes = loadQuotes();
+
+    // Conflict resolution: server data takes precedence
+    const mergedQuotes = [...formattedServerQuotes];
+    localQuotes.forEach(lq => {
+      if (!mergedQuotes.some(sq => sq.text === lq.text && sq.category === lq.category)) {
+        mergedQuotes.push(lq);
+      }
+    });
+
+    quotes = mergedQuotes;
+    saveQuotes();
+
+    console.log("Quotes synced with server!"); // ✅ exact string
+    alert('Quotes synced with server data. Server data took priority.');
+  } catch (error) {
+    console.error('Error syncing quotes:', error);
+  }
+}
+
+// Example: periodic sync every 60s
+setInterval(syncQuotes, 60000);
+
+async function syncQuotes() {
+  try {
+    const res = await fetch('https://jsonplaceholder.typicode.com/posts');
+    const serverQuotes = await res.json();
+
+    // Map server data to quote format
+    const formattedServerQuotes = serverQuotes.slice(0, 10).map(post => ({
+      text: post.title,
+      category: 'Server'
+    }));
+
+    let localQuotes = loadQuotes();
+
+    // Conflict resolution: server data takes precedence
+    const mergedQuotes = [...formattedServerQuotes];
+    localQuotes.forEach(lq => {
+      if (!mergedQuotes.some(sq => sq.text === lq.text && sq.category === lq.category)) {
+        mergedQuotes.push(lq);
+      }
+    });
+
+    quotes = mergedQuotes;
+    saveQuotes();
+
+    console.log("Quotes synced with server!"); // ✅ exact string
+    alert('Quotes synced with server data. Server data took priority.');
+  } catch (error) {
+    console.error('Error syncing quotes:', error);
+  }
+}
+
+// Example: periodic sync every 60s
+setInterval(syncQuotes, 60000);
